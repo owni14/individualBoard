@@ -27,8 +27,8 @@ $(function () {
 			$("*[readonly]").removeAttr("readonly");
 			$("#modifyReadyStatus").fadeOut("slow");
 			$("#modify").fadeIn("slow");
-		});
-	});
+		}); // $("#modifyReadyStatus").click(function(e)
+	}); // $(function())
 	
 	$("#btnComment").click(function() {
 		var content = $("#cmtContent").val();
@@ -47,8 +47,8 @@ $(function () {
 			} else if (receivedData == "false") {
 				alert("답글 입력 오류");
 			}
-		});
-	});
+		}); // $.post(url, sendData, function(receivedData)
+	}); // $("#btnComment").click(function()
 	
 	getCommentList()
 	
@@ -69,12 +69,72 @@ $(function () {
 				tr += "<td>" + this.c_content + "</td>";
 				tr += "<td>" + this.id + "</td>";
 				tr += "<td>" + this.c_date + "</td>";
+				tr += "<td>";
+				
+				var login_id = "${sessionScope.myMemberVo.id}";
+				if (login_id == this.id) {
+				tr += "<button type='button' class='btn btn-sm btn-warning commentModify'>수정</button>";
+				tr += "<button type='button' class='btn btn-sm btn-danger commentDelete' data-cid='" + this.c_id + "'>삭제</button>";
+				}
+				
+				tr += "</td>";
 				tr += "</tr>";
 				$("#commentTable > tbody").append(tr);
-			});
+			}); // $.each(jData, function()
+		}); // $.post(url, sendData, function(receivedData)
+	} // getCommentList()
+	
+	var comment_tr;
+	$("#commentTable").on("click", ".commentModify", function() {
+// 		console.log("clicked");
+		$("#modal-54556").trigger("click");
+		comment_tr = $(this).parent().parent();
+		var c_content = comment_tr.find("td").eq(1).text();
+// 		console.log("c_content:" + c_content);
+		$("#txtComment").val(c_content);
+	});
+	
+	$("#commentTable").on("click", ".commentDelete", function() {
+// 		console.log("delete");
+		var c_id = $(this).attr("data-cid");
+		console.log("c_id:" + c_id);
+		var url = "/mypro17/myboard/comment_delete";
+		var sData = {
+				"c_id" : c_id
+		};
+		$.post(url, sData, function(rData) {
+			if (rData == "true") {
+				$("#commentTable > tbody > tr").remove();
+				getCommentList();
+			} else {
+				alert("댓글 삭제 오류");
+			}
 		});
-	}
-});
+	});
+	
+	$("#btnCommentUpdate").click(function() {
+		var c_id = comment_tr.find("td").eq(0).text();
+		var c_content = $("#txtComment").val();
+// 		console.log("c_id:" + c_id);
+// 		console.log("c_content:" + c_content);
+		var url = "/mypro17/myboard/comment_update";
+		var sData = {
+			"c_id" : c_id,
+			"c_content" : c_content
+		};
+		$.post(url, sData, function(rData) {
+// 			console.log("rData:" + rData);
+			if (rData == "true") {
+// 				console.log("complete");
+				comment_tr.find("td").eq(1).text(c_content);
+			} else {
+// 				console.log("fail");
+				alert("댓글 수정 오류");
+			}
+		});
+	});
+	
+}); // $(function ()) - Main
 </script>
 </head>
 <%
@@ -82,6 +142,34 @@ $(function () {
 %>
 <body>
 	<div class="container-fluid">
+<!-- Modal -->
+	<div class="row">
+		<div class="col-md-12">
+			 <a id="modal-54556" href="#modal-container-54556" role="button" class="btn" data-toggle="modal" style="display: none;">Launch demo modal</a>
+			<div class="modal fade" id="modal-container-54556" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+				<div class="modal-dialog" role="document">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="myModalLabel">
+								댓글 수정
+							</h5> 
+							<button type="button" class="close" data-dismiss="modal">
+								<span aria-hidden="true">×</span>
+							</button>
+						</div>
+						<div class="modal-body">
+							<input type="text" class="form-control" id="txtComment">
+						</div>
+						<div class="modal-footer">
+							<button type="button" class="btn btn-primary" id="btnCommentUpdate" data-dismiss="modal">저장</button> 
+							<button type="button" class="btn btn-secondary" data-dismiss="modal">닫기</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<!-- // Modal -->
 		<div class="row">
 			<div class="col-md-12">
 				<div class="jumbotron card card-block">
@@ -159,9 +247,10 @@ $(function () {
 					<thead>
 						<tr>
 							<th>#</th>
-							<th>Content</th>
-							<th>Writer</th>
-							<th>Date</th>
+							<th>내용</th>
+							<th>작성자</th>
+							<th>날짜</th>
+							<th>수정/삭제</th>
 						</tr>
 					</thead>
 					<tbody>

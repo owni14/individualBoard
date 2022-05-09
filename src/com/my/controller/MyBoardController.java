@@ -14,7 +14,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.my.dao.MyConnectionManager;
 import com.my.service.IMyBoardService;
+import com.my.service.MyBoardCommentDeleteRunService;
 import com.my.service.MyBoardCommentGetListService;
+import com.my.service.MyBoardCommentUpdateRunService;
 import com.my.service.MyBoardCommentWriteRunService;
 import com.my.service.MyBoardContentService;
 import com.my.service.MyBoardDeleteRunService;
@@ -35,7 +37,6 @@ public class MyBoardController extends HttpServlet {
 		String path = request.getPathInfo();
 		Connection conn = MyConnectionManager.getConnection();
 		
-		// Test
 		try {
 			switch (path) {
 			case "/list":
@@ -70,6 +71,12 @@ public class MyBoardController extends HttpServlet {
 				break;
 			case "/comment_get_list":
 				service = new MyBoardCommentGetListService(conn);
+				break;
+			case "/comment_update":
+				service = new MyBoardCommentUpdateRunService(conn);
+				break;
+			case "/comment_delete":
+				service = new MyBoardCommentDeleteRunService(conn);
 				break;
 			}
 		

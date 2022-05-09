@@ -69,4 +69,44 @@ public class MyCommentDao {
 		}
 		return null;
 	}
+	
+	public boolean updateComment(int c_id, String c_content) {
+		PreparedStatement pstmt = null;
+		try {
+			String sql = "update my_comment set"
+					+ "	  c_content = ?"
+					+ "   where c_id = ?";
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, c_content);
+			pstmt.setInt(2, c_id);
+			int count = pstmt.executeUpdate();
+			if (count > 0) {
+				return true;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(pstmt, null);
+		}
+		return false;
+	}
+	
+	public boolean deleteComment(int c_id) {
+		PreparedStatement pstmt = null;
+		try {
+			 String sql = "delete from my_comment"
+			 		+ "    where c_id = ?";
+			 pstmt = conn.prepareStatement(sql);
+			 pstmt.setInt(1, c_id);
+			 int count = pstmt.executeUpdate();
+			 if (count > 0) {
+				 return true;
+			 }
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			closeAll(pstmt, null);
+		}
+		return false;
+	}
 }
